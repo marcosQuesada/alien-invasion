@@ -7,6 +7,7 @@ import (
 
 type engine struct {
 	writer io.WriteCloser
+	board  *PlanetMap
 }
 
 func NewGame(w io.WriteCloser) *engine {

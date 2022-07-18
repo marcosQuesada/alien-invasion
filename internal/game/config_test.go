@@ -104,12 +104,12 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 			line:        "X-1-0 north=X-0-0 east=X-1-1",
 			totalCities: 3,
 			planetMap: &PlanetMap{
-				Cities: map[CityName]*City{
+				cities: map[CityName]*City{
 					CityName("X-1-0"): NewCity("X-1-0"),
 					CityName("X-0-0"): NewCity("X-0-0"),
 					CityName("X-1-1"): NewCity("X-1-1"),
 				},
-				Roads: map[CityName][]*Road{
+				roads: map[CityName][]*Road{
 					CityName("X-1-0"): []*Road{
 						NorthDirection: {Remote: CityName("X-0-0")},
 						EastDirection:  {Remote: CityName("X-1-1")},
@@ -135,13 +135,13 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 			line:        "Foo north=Bar west=Baz south=Qu-ux",
 			totalCities: 4,
 			planetMap: &PlanetMap{
-				Cities: map[CityName]*City{
+				cities: map[CityName]*City{
 					CityName("Foo"):   NewCity("Foo"),
 					CityName("Bar"):   NewCity("Bar"),
 					CityName("Baz"):   NewCity("Baz"),
 					CityName("Qu-ux"): NewCity("Qu-ux"),
 				},
-				Roads: map[CityName][]*Road{
+				roads: map[CityName][]*Road{
 					CityName("Foo"): []*Road{
 						NorthDirection: {Remote: CityName("Bar")},
 						EastDirection:  nil,
@@ -173,12 +173,12 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 			line:        "Bar south=Foo west=Bee",
 			totalCities: 3,
 			planetMap: &PlanetMap{
-				Cities: map[CityName]*City{
+				cities: map[CityName]*City{
 					CityName("Bar"): NewCity("Bar"),
 					CityName("Foo"): NewCity("Foo"),
 					CityName("Bee"): NewCity("Bee"),
 				},
-				Roads: map[CityName][]*Road{
+				roads: map[CityName][]*Road{
 					CityName("Bar"): []*Road{
 						NorthDirection: nil,
 						EastDirection:  nil,
@@ -208,16 +208,16 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 			t.Fatalf("Unexxpected error %v on line %s", err, sample.line)
 		}
 
-		if expected, got := sample.totalCities, len(m.Cities); expected != got {
+		if expected, got := sample.totalCities, len(m.cities); expected != got {
 			log.Fatalf("total cities dos not match, expected %d got %d", expected, got)
 		}
 
-		if expected, got := len(m.Roads), len(sample.planetMap.Roads); expected != got {
+		if expected, got := len(m.roads), len(sample.planetMap.roads); expected != got {
 			log.Fatalf("total edges dos not match, expected %d got %d", expected, got)
 		}
 
-		for cityName, roads := range sample.planetMap.Roads {
-			v, ok := m.Roads[cityName]
+		for cityName, roads := range sample.planetMap.roads {
+			v, ok := m.roads[cityName]
 			if !ok {
 				t.Fatalf("unable to find road %s on PlanetMap", cityName)
 			}
@@ -231,21 +231,21 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 
 func TestLoadMapFromConfigFileWithDuplicatedEdgeDefinitions(t *testing.T) {
 	filename := "test.csv"
-	m, err := LoaDefinitions(filename)
+	m, err := LoaDefinitionsFromFile(filename)
 	if err != nil {
 		t.Fatalf("unable to load file %s error %v", filename, err)
 	}
 
-	if expected, got := 4, len(m.Cities); expected != got {
+	if expected, got := 4, len(m.cities); expected != got {
 		t.Fatalf("total cities does not match, expected %d got %d", expected, got)
 	}
 
-	if expected, got := 4, len(m.Roads); expected != got {
+	if expected, got := 4, len(m.roads); expected != got {
 		t.Fatalf("total road map does not match, expected %d got %d", expected, got)
 	}
 
 	city10 := CityName("CITY-1-0")
-	roadsCity10, ok := m.Roads[city10]
+	roadsCity10, ok := m.roads[city10]
 	if !ok {
 		t.Fatalf("Road %s not found", city10)
 	}
@@ -257,7 +257,7 @@ func TestLoadMapFromConfigFileWithDuplicatedEdgeDefinitions(t *testing.T) {
 	}
 
 	city11 := CityName("CITY-1-1")
-	roadsCity11, ok := m.Roads[city11]
+	roadsCity11, ok := m.roads[city11]
 	if !ok {
 		t.Fatalf("Road %s not found", city11)
 	}
@@ -269,7 +269,7 @@ func TestLoadMapFromConfigFileWithDuplicatedEdgeDefinitions(t *testing.T) {
 	}
 
 	city00 := CityName("CITY-0-0")
-	roadsCity00, ok := m.Roads[city00]
+	roadsCity00, ok := m.roads[city00]
 	if !ok {
 		t.Fatalf("Road %s not found", city00)
 	}
@@ -281,7 +281,7 @@ func TestLoadMapFromConfigFileWithDuplicatedEdgeDefinitions(t *testing.T) {
 	}
 
 	city01 := CityName("CITY-0-1")
-	roadsCity01, ok := m.Roads[city01]
+	roadsCity01, ok := m.roads[city01]
 	if !ok {
 		t.Fatalf("Road %s not found", city01)
 	}

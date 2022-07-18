@@ -1,105 +1,65 @@
 package game
 
-import (
-	"fmt"
-	"strings"
-)
+import log "github.com/sirupsen/logrus"
 
-type DirectionType int
+const maxAliensByCity = 2
 
-const (
-	NorthDirection DirectionType = iota
-	EastDirection
-	SouthDirection
-	WestDirection
-)
-
-const (
-	North = "north"
-	East  = "east"
-	South = "south"
-	West  = "west"
-)
-
-func DirectionTypeFromString(s string) (DirectionType, error) {
-	s = strings.ToLower(s)
-	switch s {
-	case North:
-		return NorthDirection, nil
-	case East:
-		return EastDirection, nil
-	case South:
-		return SouthDirection, nil
-	case West:
-		return WestDirection, nil
-	}
-
-	return 9, fmt.Errorf("unable to find direction from type %s", s)
-}
-
-func (d DirectionType) String() string {
-	switch d {
-	case NorthDirection:
-		return North
-	case EastDirection:
-		return East
-	case SouthDirection:
-		return South
-	case WestDirection:
-		return West
-	}
-
-	return "" // Cannot happen directions are assumed already validated
-}
-
-func (d DirectionType) Opposite() DirectionType {
-	switch d {
-	case NorthDirection:
-		return SouthDirection
-	case EastDirection:
-		return WestDirection
-	case SouthDirection:
-		return NorthDirection
-	case WestDirection:
-		return EastDirection
-	}
-
-	return 9 // Cannot happen directions are assumed already validated
+type Road struct {
+	Remote CityName
 }
 
 type CityName string
 
 type City struct {
 	name     CityName
-	visitors map[string]struct{}
+	visitors map[AlienName]*Alien
+}
+
+type PlanetMap struct {
+	cities map[CityName]*City
+	roads  map[CityName][]*Road // Indexed by Direction as INT
+}
+
+func (p *PlanetMap) Dump() string {
+	return "DUMPING PLANET MAP" // @TODO: Fullfill
+}
+
+func newEmptyMap() *PlanetMap {
+	return &PlanetMap{
+		cities: make(map[CityName]*City),
+		roads:  make(map[CityName][]*Road),
+	}
 }
 
 func NewCity(name CityName) *City {
 	return &City{
 		name:     name,
-		visitors: make(map[string]struct{}),
+		visitors: make(map[AlienName]*Alien),
 	}
 }
 
-func (c *City) Name() CityName {
+func (c *City) Name() CityName { // @TODO CLEAN
 	return c.name
 }
 
-type Road struct {
-	Remote CityName
-}
+func (c *City) AddVisitor(a *Alien) error {
+	log.Infof("Add visitor on city %s alienName %s", c.name, a.name)
 
-type PlanetMap struct {
-	Cities map[CityName]*City
-	Roads  map[CityName][]*Road // Indexed by Direction as INT
+	c.visitors[a.name] = a
+	if len(c.visitors) < maxAliensByCity {
+		return nil
+	}
 
-	//mutex *sync.Mutex
-}
+	log.Printf("War started on City %s 2 aliens", c.name)
 
-func NewEmptyMap() *PlanetMap {
-	return &PlanetMap{
-		Cities: make(map[CityName]*City),
-		Roads:  make(map[CityName][]*Road),
-		//mutex:  &sync.Mutex{},
+	v := []AlienName{}
+	for _, visitor := range c.visitors { // @TODO: Max visitors 2...
+		v = append(v, visitor.name)
+	}
+
+	return &ErrCityWarStarted{
+		city:   c.name,
+		alienA: v[0],
+		alienB: v[1],
 	}
 }

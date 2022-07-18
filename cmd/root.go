@@ -9,6 +9,7 @@ import (
 
 var (
 	cfgFile       string
+	totalAliens   int
 	maxIterations int
 )
 
@@ -27,6 +28,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "planet X config file")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "planet.csv", "planet X config file")
+	rootCmd.PersistentFlags().IntVar(&totalAliens, "aliens", 2, "total aliens on map")
 	rootCmd.PersistentFlags().IntVar(&maxIterations, "max-iterations", 10000, "max alien iterations")
 }

@@ -55,3 +55,29 @@ Feel free to make assumptions (for example, that the city names will never
 contain numeric characters), but please add comments or assertions describing
 the assumptions you are making.
 
+## Assumptions
+
+## Development Notes
+- Game is modeled as an Engine that holds its state on the planetMap, Aliens are position aware (@TODO) and the game stream response is wrapped on io.Writer
+- PlanetMap global lock requirements and Concurrency Analysis
+  - Map graph is represented with Cities as Notes and roads as Edges
+  - Trying to lower down locking context to the city needs access to multiple locks (origin and destination city), which leads to deadlock scenarios
+  - Under planet map global lock maximum concurrency equals 1, so that, even orchestrating players in its own goroutines will produce the same overall performance as just 1 single invoker goroutine
+  - 
+
+## Make it run
+#### Binary Build:
+```
+go build -o game 
+```
+
+#### Game Run
+```
+go run main.go play
+./game play
+```
+
+#### Run Test Suite
+```
+go test --race ./...
+```

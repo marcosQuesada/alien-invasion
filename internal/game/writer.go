@@ -1,5 +1,7 @@
 package game
 
+import log "github.com/sirupsen/logrus"
+
 // ChannelWriter implements io.WriterCloser in top of a string channel
 type ChannelWriter struct {
 	reader chan string
@@ -10,7 +12,9 @@ func NewChannelWriter() *ChannelWriter {
 }
 
 func (w *ChannelWriter) Write(p []byte) (int, error) {
-	w.reader <- string(p)
+	log.Info(string(p))
+
+	// @TODO w.reader <- string(p)
 
 	return len(p), nil
 }

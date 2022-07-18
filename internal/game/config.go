@@ -10,7 +10,7 @@ import (
 
 var ErrInvalidLineFormat = errors.New("invalid line format")
 
-func LoaDefinitions(filename string) (*PlanetMap, error) {
+func LoaDefinitionsFromFile(filename string) (*PlanetMap, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open file %s error %w", filename, err)
@@ -19,7 +19,7 @@ func LoaDefinitions(filename string) (*PlanetMap, error) {
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 
-	n := NewEmptyMap()
+	n := newEmptyMap()
 	for scanner.Scan() {
 		line := scanner.Text()
 		err := parseLine(line, n)
@@ -44,21 +44,21 @@ func parseLine(raw string, m *PlanetMap) error {
 		return fmt.Errorf("unable to parse row, error %w", err)
 	}
 
-	m.Cities[origin] = NewCity(origin)
+	m.cities[origin] = NewCity(origin)
 	for directionType, dest := range edges {
-		if _, ok := m.Cities[dest]; !ok {
-			m.Cities[dest] = NewCity(dest)
+		if _, ok := m.cities[dest]; !ok {
+			m.cities[dest] = NewCity(dest)
 		}
 
-		if _, ok := m.Roads[origin]; !ok {
-			m.Roads[origin] = make([]*Road, 4)
+		if _, ok := m.roads[origin]; !ok {
+			m.roads[origin] = make([]*Road, 4)
 		}
-		if _, ok := m.Roads[dest]; !ok {
-			m.Roads[dest] = make([]*Road, 4)
+		if _, ok := m.roads[dest]; !ok {
+			m.roads[dest] = make([]*Road, 4)
 		}
 
-		m.Roads[origin][directionType] = &Road{Remote: dest}
-		m.Roads[dest][directionType.Opposite()] = &Road{Remote: origin}
+		m.roads[origin][directionType] = &Road{Remote: dest}
+		m.roads[dest][directionType.Opposite()] = &Road{Remote: origin}
 	}
 
 	return nil

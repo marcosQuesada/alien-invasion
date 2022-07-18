@@ -25,18 +25,17 @@ var playCmd = &cobra.Command{
 			log.Fatalf("unable to load file %s error %v", cfgFile, err)
 		}
 
-		defer m.Dump()
-
 		rnd := game.NewRandomProvider()
 		runner := game.NewEngine(m, rnd)
 		writer := game.NewChannelWriter()
 		g := game.NewRunner(runner, writer)
+		defer m.Dump(writer)
 
 		for i := 0; i < totalAliens; i++ {
 			a := game.NewAlien(fmt.Sprintf("Alien-%d", i), maxIterations)
 			if exit := runner.AssignRandomPosition(a); exit {
 				return
-			} // @TODO: MOVE BACK TO GAME AGAIN
+			} // @TODO: Move to Populate!
 		}
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -45,7 +44,6 @@ var playCmd = &cobra.Command{
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
 
-		defer log.Println("Application close down")
 		for {
 			select {
 			case <-signals:

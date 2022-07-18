@@ -63,9 +63,13 @@ the assumptions you are making.
   - Map graph is represented with Cities as Notes and roads as Edges
   - Trying to lower down locking context to the city needs access to multiple locks (origin and destination city), which leads to deadlock scenarios
   - Under planet map global lock maximum concurrency equals 1, so that, even orchestrating players in its own goroutines will produce the same overall performance as just 1 single invoker goroutine
-  - 
 
 ## Make it run
+#### Dependencies
+```
+gp mod vendor
+```
+
 #### Binary Build:
 ```
 go build -o game 
@@ -81,3 +85,4 @@ go run main.go play
 ```
 go test --race ./...
 ```
+

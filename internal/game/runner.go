@@ -52,7 +52,6 @@ func (r *runner) Run(ctx context.Context) {
 }
 
 func (r *runner) Terminate() {
-	_, _ = fmt.Fprint(r.writer, "Match Over")
-	_, _ = r.writer.Write([]byte("DUMP MAP"))
+	_, _ = fmt.Fprint(r.writer, "Game Over")
 	_ = r.writer.Close()
 }

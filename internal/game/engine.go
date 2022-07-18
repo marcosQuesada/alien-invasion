@@ -161,10 +161,6 @@ func (m *engine) setCityOnWar(c CityName, a1, a2 AlienName) error {
 }
 
 func (m *engine) destroyCity(c CityName) {
-	log.Printf("Destroy City %s", c)
-	//m.mutex.Lock()
-	//defer m.mutex.Unlock()
-
 	if _, ok := m.planetMap.cities[c]; !ok {
 		return
 	}
@@ -173,10 +169,8 @@ func (m *engine) destroyCity(c CityName) {
 		if road == nil {
 			continue
 		}
-		dir := DirectionType(direction)
-		log.Printf("Closing Road From %s To %s Direction %s", c, road.Remote, dir)
 		// Remove opposite roads !
-		log.Printf("Deleting remote Road too From %s to %s Direction %s", road.Remote, c, dir.Opposite())
+		dir := DirectionType(direction)
 		m.planetMap.roads[road.Remote][dir.Opposite()] = nil
 	}
 	delete(m.planetMap.roads, c)

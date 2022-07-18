@@ -1,6 +1,11 @@
 package game
 
-import log "github.com/sirupsen/logrus"
+import (
+	"fmt"
+	"io"
+
+	log "github.com/sirupsen/logrus"
+)
 
 const maxAliensByCity = 2
 
@@ -20,8 +25,23 @@ type PlanetMap struct {
 	roads  map[CityName][]*Road // Indexed by Direction as INT
 }
 
-func (p *PlanetMap) Dump() string {
-	return "DUMPING PLANET MAP" // @TODO: Fullfill
+func (p *PlanetMap) Dump(r io.Writer) {
+	for name, _ := range p.cities {
+		res := string(name)
+		if p.roads[name][NorthDirection] != nil {
+			res = fmt.Sprintf("%s %s=%s", res, North, p.roads[name][NorthDirection].Remote)
+		}
+		if p.roads[name][EastDirection] != nil {
+			res = fmt.Sprintf("%s %s=%s", res, East, p.roads[name][EastDirection].Remote)
+		}
+		if p.roads[name][SouthDirection] != nil {
+			res = fmt.Sprintf("%s %s=%s", res, South, p.roads[name][SouthDirection].Remote)
+		}
+		if p.roads[name][WestDirection] != nil {
+			res = fmt.Sprintf("%s %s=%s", res, West, p.roads[name][WestDirection].Remote)
+		}
+		_, _ = r.Write([]byte(res))
+	}
 }
 
 func newEmptyMap() *PlanetMap {

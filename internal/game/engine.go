@@ -105,7 +105,6 @@ func (m *engine) moveToRandomNeighborhood(a *Alien) (CityName, error) {
 		return "", nil
 	}
 
-	log.Printf("Move To Random Neighborhood to alien %s", a.name)
 	roads, ok := m.planetMap.roads[a.position]
 	if !ok || len(roads) == 0 {
 		// @TODO: Isolated alien
@@ -133,18 +132,12 @@ func (m *engine) moveToRandomNeighborhood(a *Alien) (CityName, error) {
 
 	err := destinationCity.AddVisitor(a)
 	if err == nil {
-		return destinationCity.name, nil
-		// @TODO: Think on this!
-	}
-	if we, ok := err.(*ErrCityWarStarted); ok {
-		if err := m.setCityOnWar(we.city, we.alienA, we.alienB); err != nil {
-			return destinationCity.name, ErrMatchIsOver
+		city, ok := m.planetMap.cities[a.position]
+		if ok {
+			city.RemoveVisitor(a.name)
 		}
-
 		return destinationCity.name, nil
 	}
-
-	log.Errorf("cannot assign city to alien %s error %v", a.name, err)
 
 	return destinationCity.name, err
 
@@ -158,8 +151,6 @@ func (m *engine) SetCityOnWar(c CityName, a1, a2 AlienName) error {
 }
 
 func (m *engine) setCityOnWar(c CityName, a1, a2 AlienName) error {
-	log.Printf("Set City %s On War Aliens %s %s", c, a1, a2)
-
 	m.destroyCity(c)
 	delete(m.players, a1)
 	delete(m.players, a2)

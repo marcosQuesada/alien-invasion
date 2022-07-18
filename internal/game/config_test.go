@@ -203,7 +203,7 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 	}
 
 	for _, sample := range samples {
-		m := NewEmptyMap()
+		m := newEmptyMap()
 		if err := parseLine(sample.line, m); err != nil {
 			t.Fatalf("Unexxpected error %v on line %s", err, sample.line)
 		}

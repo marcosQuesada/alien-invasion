@@ -43,7 +43,7 @@ func (c *City) Name() CityName { // @TODO CLEAN
 }
 
 func (c *City) AddVisitor(a *Alien) error {
-	log.Infof("Add visitor on city %s alienName %s", c.name, a.name)
+	log.Infof("%s from %s visits city %s", a.name, a.position, c.name)
 
 	c.visitors[a.name] = a
 	if len(c.visitors) < maxAliensByCity {
@@ -62,4 +62,8 @@ func (c *City) AddVisitor(a *Alien) error {
 		alienA: v[0],
 		alienB: v[1],
 	}
+}
+
+func (c *City) RemoveVisitor(a AlienName) {
+	delete(c.visitors, a)
 }

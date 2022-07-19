@@ -45,11 +45,9 @@ func (d DirectionType) String() string {
 		return East
 	case SouthDirection:
 		return South
-	case WestDirection:
-		return West
 	}
 
-	return "" // Cannot happen directions are assumed already validated
+	return West
 }
 
 func (d DirectionType) Opposite() DirectionType {
@@ -60,9 +58,7 @@ func (d DirectionType) Opposite() DirectionType {
 		return WestDirection
 	case SouthDirection:
 		return NorthDirection
-	case WestDirection:
-		return EastDirection
 	}
 
-	return 9 // Cannot happen directions are assumed already validated
+	return EastDirection
 }

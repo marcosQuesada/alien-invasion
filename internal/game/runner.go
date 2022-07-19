@@ -1,7 +1,6 @@
 package game
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -16,29 +15,32 @@ type board interface {
 
 type runner struct {
 	board  board
-	writer io.WriteCloser
+	writer io.Writer
+	done   chan struct{}
 }
 
-func NewRunner(m board, w io.WriteCloser) *runner {
+func NewRunner(m board, w io.Writer, done chan struct{}) *runner {
 	return &runner{
 		board:  m,
 		writer: w,
+		done:   done,
 	}
 }
 
-func (r *runner) Run(ctx context.Context) {
+func (r *runner) Run() {
 	_, _ = fmt.Fprint(r.writer, "Match Started")
 	defer r.Terminate()
+
 	for {
 		select {
-		case <-ctx.Done():
+		case <-r.done:
 			return
 		default:
 			err := r.board.MoveToRandomNeighborhood(func(s string) {
 				_, _ = r.writer.Write([]byte(s))
 			})
 			if err == nil {
-				time.Sleep(time.Millisecond * 500) // @TODO: REMOVE IT
+				time.Sleep(time.Millisecond * 50) // @TODO: Move to option
 				continue
 			}
 
@@ -53,5 +55,5 @@ func (r *runner) Run(ctx context.Context) {
 
 func (r *runner) Terminate() {
 	_, _ = fmt.Fprint(r.writer, "Game Over")
-	_ = r.writer.Close()
+	close(r.done)
 }

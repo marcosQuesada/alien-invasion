@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"io"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -19,7 +20,7 @@ type engine struct {
 	planetMap *PlanetMap
 	players   map[AlienName]*Alien
 	random    Randomizer
-	mutex     *sync.Mutex // @TODO: Wait until final concurrency analysis scenario
+	mutex     *sync.Mutex // Review real needing, under single goroutine not required!
 }
 
 func NewEngine(st *PlanetMap, r Randomizer) *engine {
@@ -35,6 +36,11 @@ func NewEngine(st *PlanetMap, r Randomizer) *engine {
 func (m *engine) Populate(totalPlayers int) {
 
 }
+func (m *engine) Dump(w io.Writer) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.planetMap.Dump(w)
+}
 
 func (m *engine) AssignRandomPosition(a *Alien) (exit bool) {
 	m.mutex.Lock()
@@ -48,7 +54,7 @@ func (m *engine) AssignRandomPosition(a *Alien) (exit bool) {
 }
 
 func (m *engine) assignMapRandomPosition(a *Alien) (CityName, error) {
-	var cities []*City // @TODO: Iterative on First Round, SHOULD WE CATCH IT?
+	var cities []*City
 	for _, city := range m.planetMap.cities {
 		cities = append(cities, city)
 	}
@@ -73,7 +79,7 @@ func (m *engine) MoveToRandomNeighborhood(reporter func(string)) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	if len(m.players) == 0 {
+	if len(m.players) <= 1 {
 		return ErrMatchIsOver
 	}
 
@@ -111,7 +117,8 @@ func (m *engine) moveToRandomNeighborhood(a *Alien) (CityName, error) {
 		return "", fmt.Errorf("alien %s on position %s no Roads available ", a.name, a.position)
 	}
 
-	var availableRoads []*Road // @TODO: THIS ¿?¿?¿?
+	// Max available roads equals 4
+	var availableRoads []*Road
 	for _, r := range roads {
 		if r == nil {
 			continue
@@ -154,7 +161,7 @@ func (m *engine) setCityOnWar(c CityName, a1, a2 AlienName) error {
 	m.destroyCity(c)
 	delete(m.players, a1)
 	delete(m.players, a2)
-	if len(m.players) == 0 {
+	if len(m.players) <= 1 {
 		return ErrMatchIsOver
 	}
 	return nil

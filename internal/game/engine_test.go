@@ -42,15 +42,15 @@ func TestMoveToRandomNeighborhoodOnCollisionDestroysCity(t *testing.T) {
 		t.Fatalf("unable to load file %s error %v", filename, err)
 	}
 
-	//st := newStaticProvider()
-	st := newAltProvider()
+	st := newStaticProvider()
+	//st := newAltProvider()
 	r := NewEngine(m, st)
 	cityA := CityName("CITY-0-0")
 	a1 := NewAlien("Alien-1", 10)
 	a1.position = cityA
 	r.players[a1.name] = a1
 
-	cityB := CityName("CITY-1-0")
+	cityB := CityName("CITY-1-1")
 	a2 := NewAlien("Alien-2", 10)
 	a2.position = cityB
 	r.players[a2.name] = a2
@@ -58,9 +58,14 @@ func TestMoveToRandomNeighborhoodOnCollisionDestroysCity(t *testing.T) {
 	err = r.MoveToRandomNeighborhood(func(s string) {
 		log.Println(s)
 	})
-	if err != nil {
-		t.Fatalf("unexpected error on static random provider, error %v", err)
+	if err == nil {
+		t.Fatal("Expected Match Is Over error")
 	}
+
+	if !errors.Is(err, ErrMatchIsOver) {
+		t.Fatalf("unexpected error type, got %T", err)
+	}
+
 }
 
 type fakeRandomizer struct {

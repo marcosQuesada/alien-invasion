@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -28,33 +27,29 @@ var playCmd = &cobra.Command{
 		rnd := game.NewRandomProvider()
 		runner := game.NewEngine(m, rnd)
 		writer := game.NewChannelWriter()
-		g := game.NewRunner(runner, writer)
-		defer m.Dump(writer)
+		done := make(chan struct{})
+		g := game.NewRunner(runner, writer, done)
+
+		defer runner.Dump(writer)
 
 		for i := 0; i < totalAliens; i++ {
 			a := game.NewAlien(fmt.Sprintf("Alien-%d", i), maxIterations)
 			if exit := runner.AssignRandomPosition(a); exit {
 				return
-			} // @TODO: Move to Populate!
+			}
 		}
 
-		ctx, cancel := context.WithCancel(context.Background())
-		go g.Run(ctx)
+		go g.Run()
 
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
 
 		for {
 			select {
-			case <-signals:
-				cancel()
+			case <-done:
 				return
-			case m, ok := <-writer.Chan():
-				if !ok {
-					cancel()
-					return
-				}
-				fmt.Printf("%s \n", m)
+			case <-signals:
+				return
 			}
 		}
 	},

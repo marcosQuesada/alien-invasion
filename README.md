@@ -58,7 +58,7 @@ the assumptions you are making.
 ## Assumptions
 
 ## Development Notes
-- Game is modeled as an Engine that holds its state on the planetMap, Aliens are position aware (@TODO) and the game stream response is wrapped on io.Writer
+- Game is modeled as an Engine that holds its state on the planetMap, Aliens are position aware and the game stream response is wrapped on io.Writer
 - PlanetMap global lock requirements and Concurrency Analysis
   - Map graph is represented with Cities as Notes and roads as Edges
   - Trying to lower down locking context to the city needs access to multiple locks (origin and destination city), which leads to deadlock scenarios

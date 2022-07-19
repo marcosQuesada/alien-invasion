@@ -100,7 +100,7 @@ func TestParseLinePopulatesAllDescribedCitiesAndRoadsAsBidirectionalWithSuccess(
 		totalCities int
 		planetMap   *PlanetMap
 	}{
-		{ // @TODO: Include wrong samples!
+		{
 			line:        "X-1-0 north=X-0-0 east=X-1-1",
 			totalCities: 3,
 			planetMap: &PlanetMap{

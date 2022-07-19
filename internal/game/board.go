@@ -58,10 +58,6 @@ func NewCity(name CityName) *City {
 	}
 }
 
-func (c *City) Name() CityName { // @TODO CLEAN
-	return c.name
-}
-
 func (c *City) AddVisitor(a *Alien) error {
 	log.Infof("%s from %s visits city %s", a.name, a.position, c.name)
 
@@ -73,7 +69,7 @@ func (c *City) AddVisitor(a *Alien) error {
 	log.Printf("War started on City %s 2 aliens", c.name)
 
 	v := []AlienName{}
-	for _, visitor := range c.visitors { // @TODO: Max visitors 2...
+	for _, visitor := range c.visitors {
 		v = append(v, visitor.name)
 	}
 
